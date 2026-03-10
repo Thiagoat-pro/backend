@@ -1,17 +1,22 @@
-package model;
+package com.abouhalarodas.model;
 
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
+import lombok.*;
 import java.math.BigDecimal;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Produto {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
-    BigDecimal preco;
-    Integer estoque;
+    private BigDecimal preco;
+    private Integer estoque;
 
 
 }
