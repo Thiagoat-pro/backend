@@ -40,5 +40,25 @@ public class ProdutoService {
                 new RuntimeException("Produto não encontrado"));
     }
 
+    public Produto atualizarProduto(Long id, Produto produtoAtualizado) {
+
+        Produto produto = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+
+        produto.setNome(produtoAtualizado.getNome());
+        produto.setPreco(produtoAtualizado.getPreco());
+        produto.setEstoque(produtoAtualizado.getEstoque());
+
+        return repository.save(produto);
+    }
+
+    public void deletar(Long id) {
+
+        if (!repository.existsById(id)) {
+            throw new RuntimeException("Produto não encontrado");
+        }
+
+        repository.deleteById(id);
+    }
 
 }
