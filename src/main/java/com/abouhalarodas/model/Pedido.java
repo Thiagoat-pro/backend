@@ -1,7 +1,10 @@
 package com.abouhalarodas.model;
 
+import com.abouhalarodas.enums.StatusPedido;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,5 +27,18 @@ public class Pedido {
     private Cliente cliente;
 
     private LocalDateTime dataPedido;
+
+    @Enumerated(EnumType.STRING)
+    private StatusPedido status;
+
+    @Transient
+    public BigDecimal getTotal() {
+        if (itens == null || itens.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        return itens.stream()
+                .map(item -> item.getPrecoUnitario().multiply(new BigDecimal(item.getQuantidade())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 
 }

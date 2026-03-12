@@ -3,6 +3,7 @@ package com.abouhalarodas.controller;
 import com.abouhalarodas.model.ItemPedido;
 import com.abouhalarodas.service.ItemPedidoService;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/itens")
@@ -21,5 +22,10 @@ public class ItemPedidoController {
             @RequestParam Integer quantidade) {
 
         return itemPedidoService.criarItem(pedidoId, produtoId, quantidade);
+    }
+
+    @GetMapping("/pedidos/{pedidoId}")
+    public List<ItemPedido> listarItensPorPedido(@PathVariable Long pedidoId) {
+        return itemPedidoService.listarItensPorPedido(pedidoId);
     }
 }

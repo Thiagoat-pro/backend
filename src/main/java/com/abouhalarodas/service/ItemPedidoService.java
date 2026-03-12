@@ -8,6 +8,8 @@ import com.abouhalarodas.repository.PedidoRepository;
 import com.abouhalarodas.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ItemPedidoService {
 
@@ -41,5 +43,9 @@ public class ItemPedidoService {
         item.setPrecoUnitario(produto.getPreco());
 
         return itemPedidoRepository.save(item);
+    }
+
+    public List<ItemPedido> listarItensPorPedido(Long pedidoId) {
+        return itemPedidoRepository.findByPedidoId(pedidoId);
     }
 }
