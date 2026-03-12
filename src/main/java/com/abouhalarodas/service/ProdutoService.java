@@ -24,6 +24,10 @@ public class ProdutoService {
             throw new IllegalArgumentException("Preço deve ser maior que zero");
         }
 
+        if (produto.getEstoque() == null) {
+            produto.setEstoque(0);
+        }
+
         if (produto.getEstoque() < 0) {
             throw new IllegalArgumentException("Estoque não pode ser negativo");
         }
