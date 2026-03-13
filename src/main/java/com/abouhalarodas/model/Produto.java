@@ -16,7 +16,7 @@ public class Produto {
     private Long id;
     private String nome;
     private BigDecimal preco;
+    private BigDecimal precoPromocional;
     private Integer estoque;
-
-
+    private Boolean emPromocao;
 }

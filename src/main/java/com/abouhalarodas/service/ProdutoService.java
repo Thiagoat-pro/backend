@@ -30,6 +30,9 @@ public class ProdutoService {
         if (produto.getEstoque() < 0) {
             throw new IllegalArgumentException("Estoque não pode ser negativo");
         }
+        if (produto.getEmPromocao() == null) {
+            produto.setEmPromocao(false);
+        }
         return toDTO(repository.save(produto));
     }
 
@@ -52,6 +55,8 @@ public class ProdutoService {
         produto.setNome(produtoAtualizado.getNome());
         produto.setPreco(produtoAtualizado.getPreco());
         produto.setEstoque(produtoAtualizado.getEstoque());
+        produto.setPrecoPromocional(produtoAtualizado.getPrecoPromocional());
+        produto.setEmPromocao(produtoAtualizado.getEmPromocao() != null ? produtoAtualizado.getEmPromocao() : false);
 
         return toDTO(repository.save(produto));
     }
@@ -68,6 +73,8 @@ public class ProdutoService {
         dto.setId(produto.getId());
         dto.setNome(produto.getNome());
         dto.setPreco(produto.getPreco());
+        dto.setPrecoPromocional(produto.getPrecoPromocional());
+        dto.setEmPromocao(produto.getEmPromocao());
         return dto;
     }
 }
