@@ -1,6 +1,7 @@
 package com.abouhalarodas.dto.pedido;
 
 import com.abouhalarodas.dto.cliente.ClienteResponseDTO;
+import com.abouhalarodas.dto.endereco.EnderecoResponseDTO;
 import com.abouhalarodas.dto.item.ItemResponseDTO;
 import com.abouhalarodas.enums.StatusPedido;
 import lombok.Getter;
@@ -15,6 +16,7 @@ import java.util.List;
 public class PedidoResponseDTO {
     private Long id;
     private ClienteResponseDTO cliente;
+    private EnderecoResponseDTO endereco;
     private List<ItemResponseDTO> itens;
     private LocalDateTime dataPedido;
     private StatusPedido status;

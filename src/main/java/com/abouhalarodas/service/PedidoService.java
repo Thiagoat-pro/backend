@@ -1,13 +1,16 @@
 package com.abouhalarodas.service;
 
 import com.abouhalarodas.dto.cliente.ClienteResponseDTO;
+import com.abouhalarodas.dto.endereco.EnderecoResponseDTO;
 import com.abouhalarodas.dto.item.ItemResponseDTO;
 import com.abouhalarodas.dto.pedido.PedidoResponseDTO;
 import com.abouhalarodas.dto.produto.ProdutoResponseDTO;
 import com.abouhalarodas.model.Cliente;
+import com.abouhalarodas.model.Endereco;
 import com.abouhalarodas.model.ItemPedido;
 import com.abouhalarodas.model.Pedido;
 import com.abouhalarodas.repository.ClienteRepository;
+import com.abouhalarodas.repository.EnderecoRepository;
 import com.abouhalarodas.repository.PedidoRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +22,12 @@ public class PedidoService {
 
     private final PedidoRepository repository;
     private final ClienteRepository clienteRepository;
+    private final EnderecoRepository enderecoRepository;
 
-    public PedidoService(PedidoRepository repository, ClienteRepository clienteRepository) {
+    public PedidoService(PedidoRepository repository, ClienteRepository clienteRepository, EnderecoRepository enderecoRepository) {
         this.repository = repository;
         this.clienteRepository = clienteRepository;
+        this.enderecoRepository = enderecoRepository;
     }
 
     public Pedido save(Pedido pedido){
@@ -32,8 +37,14 @@ public class PedidoService {
 
         Cliente cliente = clienteRepository.findById(pedido.getCliente().getId())
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
-
         pedido.setCliente(cliente);
+
+        if (pedido.getEndereco() != null && pedido.getEndereco().getId() != null) {
+            Endereco endereco = enderecoRepository.findById(pedido.getEndereco().getId())
+                    .orElseThrow(() -> new RuntimeException("Endereço não encontrado"));
+            pedido.setEndereco(endereco);
+        }
+
         return repository.save(pedido);
     }
 
@@ -67,6 +78,19 @@ public class PedidoService {
         clienteDTO.setEmail(pedido.getCliente().getEmail());
         clienteDTO.setTelefone(pedido.getCliente().getTelefone());
         dto.setCliente(clienteDTO);
+
+        if (pedido.getEndereco() != null) {
+            EnderecoResponseDTO enderecoDTO = new EnderecoResponseDTO();
+            enderecoDTO.setId(pedido.getEndereco().getId());
+            enderecoDTO.setCep(pedido.getEndereco().getCep());
+            enderecoDTO.setRua(pedido.getEndereco().getRua());
+            enderecoDTO.setNumero(pedido.getEndereco().getNumero());
+            enderecoDTO.setComplemento(pedido.getEndereco().getComplemento());
+            enderecoDTO.setBairro(pedido.getEndereco().getBairro());
+            enderecoDTO.setCidade(pedido.getEndereco().getCidade());
+            enderecoDTO.setEstado(pedido.getEndereco().getEstado());
+            dto.setEndereco(enderecoDTO);
+        }
 
         if (pedido.getItens() != null) {
             List<ItemResponseDTO> itensDTO = pedido.getItens().stream().map(this::itemToDTO).collect(Collectors.toList());

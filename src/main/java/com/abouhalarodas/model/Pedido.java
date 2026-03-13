@@ -19,12 +19,16 @@ public class Pedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "pedido") //serve para evitar um possivel JSON infinito
+    @OneToMany(mappedBy = "pedido")
     private List<ItemPedido> itens;
 
     @ManyToOne
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
+
+    @ManyToOne
+    @JoinColumn(name = "endereco_id")
+    private Endereco endereco;
 
     private LocalDateTime dataPedido;
 
@@ -40,5 +44,4 @@ public class Pedido {
                 .map(item -> item.getPrecoUnitario().multiply(new BigDecimal(item.getQuantidade())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
-
 }

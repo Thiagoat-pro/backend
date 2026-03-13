@@ -35,8 +35,14 @@ public class ItemPedidoService {
         Produto produto = produtoRepository.findById(produtoId)
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
 
-        ItemPedido item = new ItemPedido();
+        if (produto.getEstoque() < quantidade) {
+            throw new RuntimeException("Estoque insuficiente. Disponível: " + produto.getEstoque());
+        }
 
+        produto.setEstoque(produto.getEstoque() - quantidade);
+        produtoRepository.save(produto);
+
+        ItemPedido item = new ItemPedido();
         item.setPedido(pedido);
         item.setProduto(produto);
         item.setQuantidade(quantidade);
@@ -47,5 +53,16 @@ public class ItemPedidoService {
 
     public List<ItemPedido> listarItensPorPedido(Long pedidoId) {
         return itemPedidoRepository.findByPedidoId(pedidoId);
+    }
+
+    public void deletarItem(Long itemId) {
+        ItemPedido item = itemPedidoRepository.findById(itemId)
+                .orElseThrow(() -> new RuntimeException("Item não encontrado"));
+
+        Produto produto = item.getProduto();
+        produto.setEstoque(produto.getEstoque() + item.getQuantidade());
+        produtoRepository.save(produto);
+
+        itemPedidoRepository.deleteById(itemId);
     }
 }

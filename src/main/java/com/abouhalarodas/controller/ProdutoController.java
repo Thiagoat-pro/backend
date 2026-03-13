@@ -32,6 +32,11 @@ public class ProdutoController {
         return service.findById(id);
     }
 
+    @GetMapping("/{id}/estoque")
+    public Integer verEstoque(@PathVariable Long id) {
+        return service.verEstoque(id);
+    }
+
     @PutMapping("/{id}")
     public ProdutoResponseDTO atualizar(@PathVariable Long id, @RequestBody Produto produto) {
         return service.atualizarProduto(id, produto);

@@ -28,4 +28,9 @@ public class ItemPedidoController {
     public List<ItemPedido> listarItensPorPedido(@PathVariable Long pedidoId) {
         return itemPedidoService.listarItensPorPedido(pedidoId);
     }
+
+    @DeleteMapping("/{itemId}")
+    public void deletarItem(@PathVariable Long itemId) {
+        itemPedidoService.deletarItem(itemId);
+    }
 }
