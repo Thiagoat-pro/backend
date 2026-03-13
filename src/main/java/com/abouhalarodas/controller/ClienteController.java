@@ -1,8 +1,8 @@
 package com.abouhalarodas.controller;
 
+import com.abouhalarodas.dto.cliente.ClienteResponseDTO;
 import com.abouhalarodas.model.Cliente;
 import com.abouhalarodas.service.ClienteService;
-
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,22 +18,22 @@ public class ClienteController {
     }
 
     @PostMapping
-    public Cliente salvar(@RequestBody Cliente cliente) {
+    public ClienteResponseDTO salvar(@RequestBody Cliente cliente) {
         return service.save(cliente);
     }
 
     @GetMapping
-    public List<Cliente> listar() {
+    public List<ClienteResponseDTO> listar() {
         return service.listar();
     }
 
     @GetMapping("/{id}")
-    public Cliente buscarPorId(@PathVariable Long id) {
+    public ClienteResponseDTO buscarPorId(@PathVariable Long id) {
         return service.findById(id);
     }
 
     @PutMapping("/{id}")
-    public Cliente atualizar(@PathVariable Long id, @RequestBody Cliente cliente) {
+    public ClienteResponseDTO atualizar(@PathVariable Long id, @RequestBody Cliente cliente) {
         return service.atualizarCliente(id, cliente);
     }
 

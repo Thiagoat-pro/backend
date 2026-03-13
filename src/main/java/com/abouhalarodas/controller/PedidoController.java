@@ -1,5 +1,6 @@
 package com.abouhalarodas.controller;
 
+import com.abouhalarodas.dto.pedido.PedidoResponseDTO;
 import com.abouhalarodas.model.Pedido;
 import com.abouhalarodas.service.PedidoService;
 import org.springframework.web.bind.annotation.*;
@@ -22,12 +23,12 @@ public class PedidoController {
     }
 
     @GetMapping
-    public List<Pedido> listar() {
+    public List<PedidoResponseDTO> listar() {
         return service.listar();
     }
 
     @GetMapping("/{id}")
-    public Pedido buscarPorId(@PathVariable Long id) {
+    public PedidoResponseDTO buscarPorId(@PathVariable Long id) {
         return service.findById(id);
     }
 
