@@ -4,6 +4,7 @@ import com.abouhalarodas.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -56,7 +57,23 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/produtos/**").permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/produtos/*/estoque").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/produtos/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/produtos/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/produtos/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/produtos/**").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/pedidos/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/pedidos/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/pedidos/**").hasRole("ADMIN")
+
+                        .requestMatchers("/itens/**").authenticated()
+
+                        .requestMatchers(HttpMethod.GET, "/clientes/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/clientes/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/clientes/**").hasRole("ADMIN")
+
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
