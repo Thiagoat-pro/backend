@@ -5,6 +5,7 @@ import com.abouhalarodas.model.Produto;
 import com.abouhalarodas.service.ProdutoService;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -25,6 +26,16 @@ public class ProdutoController {
     @GetMapping
     public List<ProdutoResponseDTO> listar() {
         return service.listar();
+    }
+
+    @GetMapping("/buscar")
+    public List<ProdutoResponseDTO> buscar(
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) Long categoriaId,
+            @RequestParam(required = false) Boolean emPromocao,
+            @RequestParam(required = false) BigDecimal precoMin,
+            @RequestParam(required = false) BigDecimal precoMax) {
+        return service.buscar(nome, categoriaId, emPromocao, precoMin, precoMax);
     }
 
     @GetMapping("/{id}")

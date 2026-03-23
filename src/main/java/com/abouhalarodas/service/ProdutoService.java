@@ -8,6 +8,7 @@ import com.abouhalarodas.repository.CategoriaRepository;
 import com.abouhalarodas.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -88,6 +89,13 @@ public class ProdutoService {
         Produto produto = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
         return produto.getEstoque();
+    }
+
+    public List<ProdutoResponseDTO> buscar(String nome, Long categoriaId, Boolean emPromocao, BigDecimal precoMin, BigDecimal precoMax) {
+        return repository.buscarComFiltros(nome, categoriaId, emPromocao, precoMin, precoMax)
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
     private ProdutoResponseDTO toDTO(Produto produto) {
