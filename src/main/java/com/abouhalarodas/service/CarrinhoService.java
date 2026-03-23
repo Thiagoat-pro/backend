@@ -1,5 +1,10 @@
 package com.abouhalarodas.service;
 
+import com.abouhalarodas.dto.carrinho.CarrinhoResponseDTO;
+import com.abouhalarodas.dto.carrinho.ItemCarrinhoResponseDTO;
+import com.abouhalarodas.dto.categoria.CategoriaResponseDTO;
+import com.abouhalarodas.dto.cliente.ClienteResponseDTO;
+import com.abouhalarodas.dto.produto.ProdutoResponseDTO;
 import com.abouhalarodas.model.*;
 import com.abouhalarodas.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +35,7 @@ public class CarrinhoService {
         });
     }
 
-    public Carrinho adicionarItem(Long clienteId, Long produtoId, Integer quantidade) {
+    public CarrinhoResponseDTO adicionarItem(Long clienteId, Long produtoId, Integer quantidade) {
         Carrinho carrinho = buscarOuCriarCarrinho(clienteId);
 
         Produto produto = produtoRepository.findById(produtoId)
@@ -38,7 +45,6 @@ public class CarrinhoService {
             throw new RuntimeException("Estoque insuficiente. Disponível: " + produto.getEstoque());
         }
 
-        // verifica se o produto já está no carrinho
         ItemCarrinho itemExistente = carrinho.getItens().stream()
                 .filter(i -> i.getProduto().getId().equals(produtoId))
                 .findFirst()
@@ -56,18 +62,18 @@ public class CarrinhoService {
             carrinho.getItens().add(item);
         }
 
-        return carrinhoRepository.save(carrinho);
+        return toDTO(carrinhoRepository.save(carrinho));
     }
 
-    public Carrinho removerItem(Long clienteId, Long itemId) {
+    public CarrinhoResponseDTO removerItem(Long clienteId, Long itemId) {
         Carrinho carrinho = buscarOuCriarCarrinho(clienteId);
         carrinho.getItens().removeIf(i -> i.getId().equals(itemId));
         itemCarrinhoRepository.deleteById(itemId);
-        return carrinhoRepository.save(carrinho);
+        return toDTO(carrinhoRepository.save(carrinho));
     }
 
-    public Carrinho verCarrinho(Long clienteId) {
-        return buscarOuCriarCarrinho(clienteId);
+    public CarrinhoResponseDTO verCarrinho(Long clienteId) {
+        return toDTO(buscarOuCriarCarrinho(clienteId));
     }
 
     public BigDecimal calcularTotal(Long clienteId) {
@@ -81,5 +87,43 @@ public class CarrinhoService {
         Carrinho carrinho = buscarOuCriarCarrinho(clienteId);
         carrinho.getItens().clear();
         carrinhoRepository.save(carrinho);
+    }
+
+    private CarrinhoResponseDTO toDTO(Carrinho carrinho) {
+        CarrinhoResponseDTO dto = new CarrinhoResponseDTO();
+        dto.setId(carrinho.getId());
+
+        ClienteResponseDTO clienteDTO = new ClienteResponseDTO();
+        clienteDTO.setId(carrinho.getCliente().getId());
+        clienteDTO.setNome(carrinho.getCliente().getNome());
+        clienteDTO.setEmail(carrinho.getCliente().getEmail());
+        clienteDTO.setTelefone(carrinho.getCliente().getTelefone());
+        dto.setCliente(clienteDTO);
+
+        List<ItemCarrinhoResponseDTO> itensDTO = carrinho.getItens().stream().map(item -> {
+            ItemCarrinhoResponseDTO itemDTO = new ItemCarrinhoResponseDTO();
+            itemDTO.setId(item.getId());
+            itemDTO.setQuantidade(item.getQuantidade());
+
+            ProdutoResponseDTO produtoDTO = new ProdutoResponseDTO();
+            produtoDTO.setId(item.getProduto().getId());
+            produtoDTO.setNome(item.getProduto().getNome());
+            produtoDTO.setPreco(item.getProduto().getPreco());
+            produtoDTO.setPrecoPromocional(item.getProduto().getPrecoPromocional());
+            produtoDTO.setEmPromocao(item.getProduto().getEmPromocao());
+
+            if (item.getProduto().getCategoria() != null) {
+                CategoriaResponseDTO categoriaDTO = new CategoriaResponseDTO();
+                categoriaDTO.setId(item.getProduto().getCategoria().getId());
+                categoriaDTO.setNome(item.getProduto().getCategoria().getNome());
+                produtoDTO.setCategoria(categoriaDTO);
+            }
+
+            itemDTO.setProduto(produtoDTO);
+            return itemDTO;
+        }).collect(Collectors.toList());
+
+        dto.setItens(itensDTO);
+        return dto;
     }
 }
