@@ -19,4 +19,8 @@ public class Produto {
     private BigDecimal precoPromocional;
     private Integer estoque;
     private Boolean emPromocao;
+
+    @ManyToOne
+    @JoinColumn(name = "categoria_id")
+    private Categoria categoria;
 }

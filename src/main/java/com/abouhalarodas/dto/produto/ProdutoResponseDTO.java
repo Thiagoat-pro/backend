@@ -1,5 +1,6 @@
 package com.abouhalarodas.dto.produto;
 
+import com.abouhalarodas.dto.categoria.CategoriaResponseDTO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,4 +14,5 @@ public class ProdutoResponseDTO {
     private BigDecimal preco;
     private BigDecimal precoPromocional;
     private Boolean emPromocao;
+    private CategoriaResponseDTO categoria;
 }

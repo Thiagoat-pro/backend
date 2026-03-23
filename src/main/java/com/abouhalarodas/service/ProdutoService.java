@@ -1,7 +1,10 @@
 package com.abouhalarodas.service;
 
+import com.abouhalarodas.dto.categoria.CategoriaResponseDTO;
 import com.abouhalarodas.dto.produto.ProdutoResponseDTO;
+import com.abouhalarodas.model.Categoria;
 import com.abouhalarodas.model.Produto;
+import com.abouhalarodas.repository.CategoriaRepository;
 import com.abouhalarodas.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
 
@@ -12,9 +15,11 @@ import java.util.stream.Collectors;
 public class ProdutoService {
 
     private final ProdutoRepository repository;
+    private final CategoriaRepository categoriaRepository;
 
-    public ProdutoService(ProdutoRepository repository) {
+    public ProdutoService(ProdutoRepository repository, CategoriaRepository categoriaRepository) {
         this.repository = repository;
+        this.categoriaRepository = categoriaRepository;
     }
 
     public ProdutoResponseDTO save(Produto produto) {
@@ -32,6 +37,11 @@ public class ProdutoService {
         }
         if (produto.getEmPromocao() == null) {
             produto.setEmPromocao(false);
+        }
+        if (produto.getCategoria() != null && produto.getCategoria().getId() != null) {
+            Categoria categoria = categoriaRepository.findById(produto.getCategoria().getId())
+                    .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+            produto.setCategoria(categoria);
         }
         return toDTO(repository.save(produto));
     }
@@ -58,6 +68,12 @@ public class ProdutoService {
         produto.setPrecoPromocional(produtoAtualizado.getPrecoPromocional());
         produto.setEmPromocao(produtoAtualizado.getEmPromocao() != null ? produtoAtualizado.getEmPromocao() : false);
 
+        if (produtoAtualizado.getCategoria() != null && produtoAtualizado.getCategoria().getId() != null) {
+            Categoria categoria = categoriaRepository.findById(produtoAtualizado.getCategoria().getId())
+                    .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+            produto.setCategoria(categoria);
+        }
+
         return toDTO(repository.save(produto));
     }
 
@@ -81,6 +97,14 @@ public class ProdutoService {
         dto.setPreco(produto.getPreco());
         dto.setPrecoPromocional(produto.getPrecoPromocional());
         dto.setEmPromocao(produto.getEmPromocao());
+
+        if (produto.getCategoria() != null) {
+            CategoriaResponseDTO categoriaDTO = new CategoriaResponseDTO();
+            categoriaDTO.setId(produto.getCategoria().getId());
+            categoriaDTO.setNome(produto.getCategoria().getNome());
+            dto.setCategoria(categoriaDTO);
+        }
+
         return dto;
     }
 }
