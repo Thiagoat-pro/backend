@@ -1,6 +1,7 @@
 package com.abouhalarodas.controller;
 
 import com.abouhalarodas.dto.pedido.PedidoResponseDTO;
+import com.abouhalarodas.enums.StatusPedido;
 import com.abouhalarodas.model.Pedido;
 import com.abouhalarodas.service.PedidoService;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +36,11 @@ public class PedidoController {
     @GetMapping("/{id}")
     public PedidoResponseDTO buscarPorId(@PathVariable Long id) {
         return service.findById(id);
+    }
+
+    @PatchMapping("/{id}/status")
+    public PedidoResponseDTO atualizarStatus(@PathVariable Long id, @RequestParam StatusPedido status) {
+        return service.atualizarStatus(id, status);
     }
 
     @DeleteMapping("/{id}")

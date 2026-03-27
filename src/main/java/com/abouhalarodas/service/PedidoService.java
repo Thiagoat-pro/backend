@@ -5,6 +5,7 @@ import com.abouhalarodas.dto.endereco.EnderecoResponseDTO;
 import com.abouhalarodas.dto.item.ItemResponseDTO;
 import com.abouhalarodas.dto.pedido.PedidoResponseDTO;
 import com.abouhalarodas.dto.produto.ProdutoResponseDTO;
+import com.abouhalarodas.enums.StatusPedido;
 import com.abouhalarodas.model.Cliente;
 import com.abouhalarodas.model.Endereco;
 import com.abouhalarodas.model.ItemPedido;
@@ -70,6 +71,13 @@ public class PedidoService {
 
     public void deletar(Long id) {
         repository.deleteById(id);
+    }
+
+    public PedidoResponseDTO atualizarStatus(Long id, StatusPedido status) {
+        Pedido pedido = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+        pedido.setStatus(status);
+        return toDTO(repository.save(pedido));
     }
 
     private PedidoResponseDTO toDTO(Pedido pedido) {
