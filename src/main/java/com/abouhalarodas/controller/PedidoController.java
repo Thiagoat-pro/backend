@@ -27,6 +27,11 @@ public class PedidoController {
         return service.listar();
     }
 
+    @GetMapping("/cliente/{clienteId}")
+    public List<PedidoResponseDTO> listarPorCliente(@PathVariable Long clienteId) {
+        return service.listarPorCliente(clienteId);
+    }
+
     @GetMapping("/{id}")
     public PedidoResponseDTO buscarPorId(@PathVariable Long id) {
         return service.findById(id);

@@ -4,13 +4,17 @@ import com.abouhalarodas.dto.carrinho.CarrinhoResponseDTO;
 import com.abouhalarodas.dto.carrinho.ItemCarrinhoResponseDTO;
 import com.abouhalarodas.dto.categoria.CategoriaResponseDTO;
 import com.abouhalarodas.dto.cliente.ClienteResponseDTO;
+import com.abouhalarodas.dto.pedido.PedidoResponseDTO;
 import com.abouhalarodas.dto.produto.ProdutoResponseDTO;
+import com.abouhalarodas.enums.StatusPedido;
 import com.abouhalarodas.model.*;
 import com.abouhalarodas.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,6 +27,10 @@ public class CarrinhoService {
     private final ClienteRepository clienteRepository;
     private final ProdutoRepository produtoRepository;
     private final ItemCarrinhoRepository itemCarrinhoRepository;
+    private final PedidoRepository pedidoRepository;
+    private final ItemPedidoRepository itemPedidoRepository;
+    private final EnderecoRepository enderecoRepository;
+    private final PedidoService pedidoService;
 
     public Carrinho buscarOuCriarCarrinho(Long clienteId) {
         return carrinhoRepository.findByClienteId(clienteId).orElseGet(() -> {
@@ -87,6 +95,48 @@ public class CarrinhoService {
         Carrinho carrinho = buscarOuCriarCarrinho(clienteId);
         carrinho.getItens().clear();
         carrinhoRepository.save(carrinho);
+    }
+
+    @Transactional
+    public PedidoResponseDTO finalizarCarrinho(Long clienteId, Long enderecoId) {
+        Carrinho carrinho = buscarOuCriarCarrinho(clienteId);
+
+        if (carrinho.getItens().isEmpty()) {
+            throw new RuntimeException("Carrinho está vazio");
+        }
+
+        Endereco endereco = enderecoRepository.findById(enderecoId)
+                .orElseThrow(() -> new RuntimeException("Endereço não encontrado"));
+
+        Pedido pedido = new Pedido();
+        pedido.setCliente(carrinho.getCliente());
+        pedido.setEndereco(endereco);
+        pedido.setDataPedido(LocalDateTime.now());
+        pedido.setStatus(StatusPedido.CRIADO);
+        pedido = pedidoRepository.save(pedido);
+
+        for (ItemCarrinho itemCarrinho : carrinho.getItens()) {
+            Produto produto = itemCarrinho.getProduto();
+
+            if (produto.getEstoque() < itemCarrinho.getQuantidade()) {
+                throw new RuntimeException("Estoque insuficiente para: " + produto.getNome());
+            }
+
+            produto.setEstoque(produto.getEstoque() - itemCarrinho.getQuantidade());
+            produtoRepository.save(produto);
+
+            ItemPedido itemPedido = new ItemPedido();
+            itemPedido.setPedido(pedido);
+            itemPedido.setProduto(produto);
+            itemPedido.setQuantidade(itemCarrinho.getQuantidade());
+            itemPedido.setPrecoUnitario(produto.getPreco());
+            itemPedidoRepository.save(itemPedido);
+        }
+
+        carrinho.getItens().clear();
+        carrinhoRepository.save(carrinho);
+
+        return pedidoService.findById(pedido.getId());
     }
 
     private CarrinhoResponseDTO toDTO(Carrinho carrinho) {

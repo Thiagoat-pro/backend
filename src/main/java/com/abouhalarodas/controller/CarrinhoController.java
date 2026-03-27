@@ -1,6 +1,7 @@
 package com.abouhalarodas.controller;
 
 import com.abouhalarodas.dto.carrinho.CarrinhoResponseDTO;
+import com.abouhalarodas.dto.pedido.PedidoResponseDTO;
 import com.abouhalarodas.service.CarrinhoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -42,5 +43,12 @@ public class CarrinhoController {
     @DeleteMapping("/{clienteId}/limpar")
     public void limparCarrinho(@PathVariable Long clienteId) {
         carrinhoService.limparCarrinho(clienteId);
+    }
+
+    @PostMapping("/{clienteId}/finalizar")
+    public PedidoResponseDTO finalizar(
+            @PathVariable Long clienteId,
+            @RequestParam Long enderecoId) {
+        return carrinhoService.finalizarCarrinho(clienteId, enderecoId);
     }
 }

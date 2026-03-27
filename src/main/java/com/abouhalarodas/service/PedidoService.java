@@ -61,6 +61,13 @@ public class PedidoService {
         return toDTO(pedido);
     }
 
+    public List<PedidoResponseDTO> listarPorCliente(Long clienteId) {
+        return repository.findByClienteId(clienteId)
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
     public void deletar(Long id) {
         repository.deleteById(id);
     }
